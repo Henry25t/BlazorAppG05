@@ -1,0 +1,77 @@
+@page "/rol/index"
+@using System.Text.Json;
+@using SysSeguridadG05.EN;
+@inject HttpClient http
+@inject NavigationManager NavManager;
+
+<PageTitle>Index</PageTitle>
+
+<button id="idNuevo" class="btn btn-primary" @onclick="newRol">Nuevo Rol</button>
+<h3>Buscar</h3>
+
+<div class="row">
+    <div class="col-sm-12">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="idBusNombre" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <button class="btn btn-primary">Buscar</button>
+    </div>
+</div>
+
+@if (roles == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rol in roles)
+            {
+                <tr>
+                    <td>@rol.Nombre</td>
+                    <td> <button class="btn btn-success" @onclick="(() => goModify(rol.Id))">Modificar</button></td>
+                    <td> <button class="btn btn-warning" onclick="">Detalle</button></td>
+                    <td> <button class="btn btn-danger" onclick="">Eliminar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Rol[]? roles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            roles = await http.GetFromJsonAsync<Rol[]>("Rol");
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception(ex.Message);
+        }
+
+    }
+
+    void newRol()
+    {
+        NavManager.NavigateTo("/rol/create");
+    }
+
+    void goModify(int pId)
+    {
+        NavManager.NavigateTo($"/rol/edit/{pId}");
+    }
+}

@@ -1,0 +1,52 @@
+@page "/ejemplo/sumar"
+<h3>Sumar</h3>
+<div class="row">
+    <div class="form-control">
+        <div class="col-sm-12">
+            <label class="form-label">Numero 1</label>
+            <input type="text" id="idNum1" class="form-control" @bind-value="num1"/>
+        </div>
+    </div>
+</div>
+    <div class="row">
+        <div class="form-control">
+            <div class="col-sm-12">
+                <label class="form-label">NUmero2</label>
+                <input type="text" id="idNum2" class="form-control" @bind-value="num2"/>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-control">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="sumarNUmero"> Sumar </button>
+                <button class="btn btn-danger" @onclick="limpiar"> Limpiar </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-control">
+            <div class="col-sm-12">
+                <label class="form-label">Resultado</label>
+                <label style="font-weight: bold;" class="text-danger">@resultado</label>
+            </div>
+        </div>
+    </div>
+@code{
+    Int32 num1 = 0 ;
+    Int32 num2 = 0 ;
+
+    Int32 resultado = 0;
+
+    private void sumarNUmero()
+    {
+        resultado = num1 + num2;
+    }
+
+    private void limpiar()
+    {
+        num1 = 0;
+        num2 = 0;
+        resultado = 0;
+    }
+}
