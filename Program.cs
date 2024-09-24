@@ -9,17 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSignalR();
-//builder.Services.AddScoped(sp => new HttpClient
-//{
-//    BaseAddress = new Uri("http://dbSeguridadPractica.somee.com/api/")
-//});
-
-
-builder.Services.AddScoped(sp => 
-new HttpClient
+builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7264/api/")
+    BaseAddress = new Uri("http://dbSeguridadPractica.somee.com/api/")
 });
+
+
+//builder.Services.AddScoped(sp =>
+//new HttpClient
+//{
+//    BaseAddress = new Uri("https://localhost:7264/api/")
+//});
 
 var app = builder.Build();
 

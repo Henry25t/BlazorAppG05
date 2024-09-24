@@ -1,0 +1,98 @@
+﻿@page "/usuario/index"
+@using System.Text.Json;
+@using SysSeguridadG05.EN;
+@using BlazorAppG05.Data;
+@inject HttpClient http
+@inject NavigationManager NavManager;
+
+<PageTitle>Index</PageTitle>
+
+<button id="idNuevo" class="btn btn-primary mb-3" @onclick="newUsuario">Nuevo Usuario</button>
+<h3>Buscar</h3>
+
+<div class="row mb-3">
+    <div class="col-sm-12">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="idBusNombre" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-sm-12">
+        <button class="btn btn-primary">Buscar</button>
+    </div>
+</div>
+
+@if (usuarios == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellio</th>
+                <th>Login</th>
+                <th>Rol</th>
+                <th>Estatus</th>
+                <th>FechaRegistro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in usuarios)
+            {
+                <tr>
+                    <td>@user.Nombre</td>
+                    <td>@user.Apellido</td>
+                    <td>@user.Login</td>
+                    <td>@(user.Rol != null ? user.Rol.Nombre : "Sin Rol")</td>
+                    <td>@(user.Estatus == 1 ? "Activo" : "Inactivo")</td>
+                    <td>@user.FechaRegistro</td>
+                    <td> <button class="btn btn-success" @onclick="(() => goModify(user.Id))">Modificar</button></td>
+                    <td> <button class="btn btn-warning" onclick="">Detalle</button></td>
+                    <td> <button class="btn btn-danger" onclick="">Eliminar</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Usuario[]? usuarios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            usuarios = await http.GetFromJsonAsync<Usuario[]>("Usuario");
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception(ex.Message);
+        }
+
+    }
+
+    void newUsuario()
+    {
+        NavManager.NavigateTo("/usuario/create");
+    }
+
+    void goModify(int pId)
+    {
+        NavManager.NavigateTo($"/usuario/edit/{pId}");
+    }
+
+    void goDetails(int pId)
+    {
+        NavManager.NavigateTo($"/usuario/detail/{pId}");
+    }
+
+    void goDelete(int pId)
+    {
+        NavManager.NavigateTo($"/usuario/delete/{pId}");
+    }
+}

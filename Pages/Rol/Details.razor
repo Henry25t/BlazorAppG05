@@ -1,0 +1,54 @@
+﻿@page "/rol/detail/{pId:int}"
+@using SysSeguridadG05.EN;
+@inject HttpClient Http;
+@inject NavigationManager NavManager
+<h3>Detalles de Rol</h3>
+
+<input type="hidden" id="idRol" @bind-value="rol.Id" />
+<div class="row mb-3">
+	<div class="col-sm-12">
+		<label class="form-label">Nombre</label>
+		<input type="text" class="form-control" id="idNombre" @bind-value="rol.Nombre" />
+	</div>
+</div>
+<div class="row mb-3">
+	<div class="col-sm-12">
+		<button class="btn btn-primary" @onclick="EnviarModificarRol">Guardar</button>
+		<button class="btn btn-secondary" @onclick="Index">Regresar</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<span style="color:red; font-weight:bold">@error</span>
+	</div>
+</div>
+
+@code {
+	Rol rol = new Rol();
+	String error = "";
+
+	[Parameter]
+	public int pId { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(pId != 0)
+		{
+			rol = await Http.GetFromJsonAsync<Rol>($"Rol/{pId}");
+		}
+		else
+		{
+			error = "Rol seleccionado no es valido";
+		}
+	}
+
+	public async Task EnviarModificarRol()
+	{
+		NavManager.NavigateTo("/rol/edit/" + pId);
+	}
+
+	public async Task Index()
+	{
+		NavManager.NavigateTo("/rol/index");
+	}
+}

@@ -1,0 +1,63 @@
+﻿@page "/rol/delete/{pId:int}"
+@using SysSeguridadG05.EN;
+@inject HttpClient Http
+@inject NavigationManager NavManager;
+
+<h3>Eliminar Rol</h3>
+
+<input type="hidden" id="idRol" @bind-value="rol.Id" />
+<div class="row mb-3">
+	<div class="col-sm-12">
+		<label class="form-label">Nombre</label>
+		<input type="text" class="form-control" id="idNombre" @bind-value="rol.Nombre" />
+	</div>
+</div>
+<div class="row mb-3">
+	<div class="col-sm-12">
+		<button class="btn btn-danger" @onclick="Eliminado">Eliminar</button>
+		<button class="btn btn-secondary" @onclick="Index">Regresar</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<span style="color:red; font-weight:bold">@error</span>
+	</div>
+</div>
+
+@code {
+	Rol rol = new Rol();
+	String error = "";
+
+	[Parameter]
+	public int pId { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (pId != 0)
+			rol = await Http.GetFromJsonAsync<Rol>($"Rol/{pId}");
+		else
+			error = " Rol selecionado no es valido";
+	}
+
+	public async Task Eliminado()
+	{
+		try
+		{
+			var resultado = await Http.DeleteAsync("Rol/" + rol.Id);
+			if(Convert.ToInt32(resultado.StatusCode) == 200)
+			{
+				Index();
+			}
+		}
+		catch (Exception ex)
+		{
+
+			throw new Exception(ex.Message);
+		}
+	}
+
+	void Index()
+	{
+		NavManager.NavigateTo("/rol/index");
+	}
+}

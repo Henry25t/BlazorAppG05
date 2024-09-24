@@ -3,21 +3,22 @@
 @using SysSeguridadG05.EN;
 @inject HttpClient http
 @inject NavigationManager NavManager;
+@using BlazorAppG05.Data;
 
 <PageTitle>Index</PageTitle>
 
-<button id="idNuevo" class="btn btn-primary" @onclick="newRol">Nuevo Rol</button>
+<button id="idNuevo" class="btn btn-primary mb-3" @onclick="newRol">Nuevo Rol</button>
 <h3>Buscar</h3>
 
-<div class="row">
+<div class="row mb-3">
     <div class="col-sm-12">
         <label class="form-label">Nombre</label>
-        <input type="text" class="form-control" id="idBusNombre" />
+        <input type="text" class="form-control" id="idBusNombre"  @bind-value="rolbus.Nombre"/>
     </div>
 </div>
-<div class="row">
+<div class="row mb-3">
     <div class="col-sm-12">
-        <button class="btn btn-primary">Buscar</button>
+        <button class="btn btn-primary" @onclick="BuscarRol">Buscar</button>
     </div>
 </div>
 
@@ -40,8 +41,8 @@ else
                 <tr>
                     <td>@rol.Nombre</td>
                     <td> <button class="btn btn-success" @onclick="(() => goModify(rol.Id))">Modificar</button></td>
-                    <td> <button class="btn btn-warning" onclick="">Detalle</button></td>
-                    <td> <button class="btn btn-danger" onclick="">Eliminar</button></td>
+                    <td> <button class="btn btn-warning" @onclick="(() => goDetails(rol.Id))">Detalle</button></td>
+                    <td> <button class="btn btn-danger" @onclick="(() => goDelete(rol.Id))">Eliminar</button></td>
                 </tr>
             }
         </tbody>
@@ -50,6 +51,7 @@ else
 
 @code {
     private Rol[]? roles;
+    RolDTO rolbus = new RolDTO();
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,6 +67,14 @@ else
 
     }
 
+    private async void BuscarRol()
+    {
+        var result = await http.PostAsJsonAsync("Rol/Buscar", rolbus);
+        var contet = await result.Content.ReadAsStringAsync();
+        roles = JsonSerializer.Deserialize<Rol[]>(contet, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        StateHasChanged();
+    }
+
     void newRol()
     {
         NavManager.NavigateTo("/rol/create");
@@ -73,5 +83,15 @@ else
     void goModify(int pId)
     {
         NavManager.NavigateTo($"/rol/edit/{pId}");
+    }
+
+    void goDetails(int pId)
+    {
+        NavManager.NavigateTo($"/rol/detail/{pId}");
+    }
+
+    void goDelete(int pId)
+    {
+        NavManager.NavigateTo($"/rol/delete/{pId}");
     }
 }
