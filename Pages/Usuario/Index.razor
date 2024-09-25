@@ -51,7 +51,7 @@ else
                     <td>@(user.Estatus == 1 ? "Activo" : "Inactivo")</td>
                     <td>@user.FechaRegistro</td>
                     <td> <button class="btn btn-success" @onclick="(() => goModify(user.Id))">Modificar</button></td>
-                    <td> <button class="btn btn-warning" onclick="">Detalle</button></td>
+                    <td> <button class="btn btn-warning" @onclick="(()=> goDetails(user.Id))">Detalle</button></td>
                     <td> <button class="btn btn-danger" onclick="">Eliminar</button></td>
                 </tr>
             }

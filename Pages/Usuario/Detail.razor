@@ -1,0 +1,129 @@
+﻿@page "/usuario/detail/{pId:int}"
+@using SysSeguridadG05.EN;
+@using BlazorAppG05.Data;
+@inject HttpClient Http;
+@inject NavigationManager NavManager
+
+<h3>Detalle Usuario</h3>
+
+<div class="row">
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <input type="hidden" @bind-value="usuario.Id" />
+                <label class="form-label">Rol</label>
+                <input type="text" class="form-control" id="idRol" readonly @bind-value="rol.Nombre" />
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="idNombre" readonly @bind-value="usuario.Nombre" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <label class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="idApellido" readonly @bind-value="usuario.Apellido" />
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <label class="form-label">Login</label>
+                <input type="text" class="form-control" id="idLogin" readonly @bind-value="usuario.Login" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <label class="form-label">Estatus</label>
+               <input type="text" class="form-control" readonly @bind-value="estado"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <button class="btn btn-success" @onclick="ModificarUsuario">Modificar</button>
+                <button class="btn btn-secondary" @onclick="Index">Regresar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <span style="color:red; font-weight:bold">@error</span>
+    </div>
+</div>
+
+@code {
+    Usuario? usuario = new Usuario();
+    Rol rol = new Rol();
+    string estado = "";
+    string error = "";
+
+    [Parameter]
+    public int pId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (pId != 0)
+            {
+                usuario = await Http.GetFromJsonAsync<Usuario>("Usuario/" + pId);
+                rol = await Http.GetFromJsonAsync<Rol>("Rol/" + usuario.IdRol);
+
+                if (usuario.Estatus == 1)
+                    estado = "ACTIVO";
+                else
+                    estado = "INACTIVO";
+
+            }
+            else
+            {
+                error = "Usuario seleccionado es invalido";
+            }
+
+        }
+        catch (Exception ex)
+        {
+            error = "Error al cargar: " + ex.Message;
+        }
+    }
+
+    public async Task ModificarUsuario()
+    {
+        try
+        {
+            NavManager.NavigateTo("/usuario/edit/" + usuario.Id);
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception(ex.Message.ToString());
+        }
+    }
+
+    void Index()
+    {
+        NavManager.NavigateTo("/usuario/index");
+    }
+}

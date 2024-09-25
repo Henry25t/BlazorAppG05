@@ -1,20 +1,21 @@
-﻿@page "/usuario/create"
+﻿@page "/usuario/edit/{pId:int}"
 @using SysSeguridadG05.EN;
 @using BlazorAppG05.Data;
 @inject HttpClient Http;
 @inject NavigationManager NavManager
 
-<h3>Registrar</h3>
+<h3>Modificar Usuario</h3>
 
 <div class="row">
     <div class="col-6">
         <div class="row mb-3">
             <div class="col-sm-12">
+                <input type="hidden" @bind-value="usuario.Id" />
                 <label class="form-label">Rol</label>
                 <InputSelect id="roles" class="form-select" @bind-Value="usuario.IdRol">
                     @foreach (var item in roles)
                     {
-                        @if(roles.Count == 0)
+                        @if (roles.Count == 0)
                         {
                             <option disabled>Cargando roles...</option>
                         }
@@ -29,16 +30,16 @@
                     }
                 </InputSelect>
             </div>
-        </div>       
+        </div>
     </div>
-   <div class="col-6">
+    <div class="col-6">
         <div class="row mb-3">
             <div class="col-sm-12">
                 <label class="form-label">Nombre</label>
                 <input type="text" class="form-control" id="idNombre" @bind-value="usuario.Nombre" />
             </div>
         </div>
-   </div>
+    </div>
 </div>
 
 <div class="row">
@@ -64,25 +65,6 @@
     <div class="col-6">
         <div class="row mb-3">
             <div class="col-sm-12">
-                <label class="form-label">Password</label>
-                <input type="text" class="form-control" id="idPassword" @bind-value="usuario.Password" />
-            </div>
-        </div>
-    </div>
-    <div class="col-6">
-        <div class="row mb-3">
-            <div class="col-sm-12">
-                <label class="form-label">Comfirmar Password</label>
-                <input type="text" class="form-control" id="idComfirmarPassword" @bind-value="usuario.ConfirmPassword_aux" />
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-6">
-        <div class="row mb-3">
-            <div class="col-sm-12">
                 <label class="form-label">Estatus</label>
                 <InputSelect id="roles" class="form-select" @bind-Value="usuario.Estatus">
                     @foreach (var item1 in estados)
@@ -99,7 +81,7 @@
     <div class="col-6">
         <div class="row mb-3">
             <div class="col-sm-12">
-                <button class="btn btn-primary" @onclick="CreateUsuario">Guardar</button>
+                <button class="btn btn-primary" @onclick="ModificarUsuario">Guardar</button>
                 <button class="btn btn-secondary" @onclick="Index">Regresar</button>
             </div>
         </div>
@@ -119,6 +101,9 @@
     List<Estado> estados = new List<Estado>();
     string error = "";
 
+    [Parameter]
+    public int pId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadRoles();
@@ -128,15 +113,18 @@
     {
         try
         {
-            // La API devuelve la lista de roles desde el endpoint "/api/roles"
-            roles = await Http.GetFromJsonAsync<List<Rol>>("rol");
-            Estado estado = new Estado { Id = 0, Nombre = "      SELECCIONAR     " };
-            Estado estado1 = new Estado { Id = 1, Nombre = "ACTIVO" };
-            Estado estado2 = new Estado { Id = 2, Nombre = "INACTIVO" };
+            if(pId != 0)
+            {
+                usuario = await Http.GetFromJsonAsync<Usuario>("Usuario/" + pId);
+                roles = await Http.GetFromJsonAsync<List<Rol>>("rol");
+                Estado estado = new Estado { Id = 0, Nombre = "SELECCIONAR" };
+                Estado estado1 = new Estado { Id = 1, Nombre = "ACTIVO" };
+                Estado estado2 = new Estado { Id = 2, Nombre = "INACTIVO" };
 
-            estados.Add(estado);
-            estados.Add(estado1);
-            estados.Add(estado2);
+                estados.Add(estado);
+                estados.Add(estado1);
+                estados.Add(estado2);
+            }
         }
         catch (Exception ex)
         {
@@ -144,25 +132,18 @@
         }
     }
 
-    public async Task CreateUsuario()
+    public async Task ModificarUsuario()
     {
         try
         {
-            if(usuario.Password != usuario.ConfirmPassword_aux)
+            var resultado = await Http.PutAsJsonAsync<Usuario>("Usuario/" + usuario.Id, usuario);
+            if (Convert.ToInt32(resultado.StatusCode) == 200)
             {
-                error = "Password deben ser iguales";
+                Index();
             }
             else
             {
-                var resultado = await Http.PostAsJsonAsync<Usuario>("Usuario", usuario);
-                if (Convert.ToInt32(resultado.StatusCode) == 200)
-                {
-                    Index();
-                }
-                else
-                {
-                    error = "Error al ingresar el Usuario";
-                }
+                error = "Error al ingresar el Usuario";
             }
         }
         catch (Exception ex)
